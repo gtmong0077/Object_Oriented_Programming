@@ -1,27 +1,8 @@
 #include <iostream>
 #include <string>
+#include "Fraction.h"
+#include <cmath>
 using namespace std;
-
-class Fraction {
-    private:
-        int numerator;
-        int denominator;
-    public:
-        Fraction();
-        Fraction(int numer,int denom=1);
-        Fraction(const Fraction& fract);
-        ~Fraction();
-
-        int getNumerator() const{return numerator;}
-        int getDenominator() const{return denominator;}
-        void setNumerator(int numer);
-        void setDenominator(int denom);
-        string print() const;
-
-    private:
-        bool normalize();
-        int gcd(int n,int m);
-};
 
 Fraction::Fraction() : numerator(0), denominator(1) {}
 Fraction::Fraction(int numer, int denom) : numerator(numer), denominator(denom) {
@@ -30,9 +11,39 @@ Fraction::Fraction(int numer, int denom) : numerator(numer), denominator(denom) 
 Fraction::Fraction(const Fraction& fract) : numerator(fract.numerator), denominator(fract.denominator) {}
 Fraction::~Fraction() {}
 
-string Fraction::print() const{
-    return to_string(numerator) + "/" + to_string(denominator);
+
+// Definition
+Fraction :: operator double() const
+{
+    double num = static_cast <double>(numerator);
+    return (num / denominator);
 }
+
+// string Fraction::print() const{
+//     return to_string(numerator) + "/" + to_string(denominator);
+// }
+
+istream& operator >>(istream& left, Fraction& right)
+{
+    cout << "Enter the value of numerator: " ;
+    left >> right.numerator;
+    cout << "Enter the value of denominator: " ;
+    left >> right.denominator;
+    right.normalize();
+    return left;
+}
+// Definition of << operator
+
+// Definition of << operator
+ostream& operator << (ostream& left, const Fraction& right)
+{
+    left << right.numerator << "/" << right.denominator << endl;
+    return left;
+}
+
+int Fraction::getNumerator() const { return numerator; }
+int Fraction::getDenominator() const { return denominator; }
+
 void Fraction::setNumerator(int numer){
     numerator = numer;
     normalize();
@@ -69,29 +80,34 @@ int Fraction::gcd(int n, int m){ // greatest common divisor 최대공약수
     return gcd;
 }
 
-int main(){
-    //Instantiation of some objects
-    Fraction fract1;            //Default constructor
-    Fraction fract2(14,21);    //Constructor with two parameters
-    Fraction fract3(11,-8); 
-    Fraction fract4(fract3);    //Copy constructor
+// *** Friend 함수 구현 (슬라이드의 공식 적용) ***
 
-    //Printing the object
-    cout<<"fract1: "<<fract1.print()<<endl;
-    cout<<"fract2: "<<fract2.print()<<endl;
-    cout<<"fract3: "<<fract3.print()<<endl;
-    cout<<"fract4: "<<fract4.print()<<endl;
-
-    //Using mutators
-    cout<<fract1.getNumerator()<<endl;
-    cout<<fract1.getDenominator()<<endl;
-    fract1.setNumerator(9);
-    fract1.setDenominator(12);
-    cout<<fract1.getNumerator()<<endl;
-    cout<<fract1.getDenominator()<<endl;
-    cout<<fract1.print()<<endl;
-    fract2.setDenominator(12);
-    cout<<fract2.print()<<endl;
-
-    return 0;
+// 덧셈: (a*d + b*c) / (b*d)
+Fraction operator+(const Fraction& left, const Fraction& right) {
+    int newNumer = left.numerator * right.denominator + right.numerator * left.denominator;
+    int newDenom = left.denominator * right.denominator;
+    return Fraction(newNumer, newDenom);
 }
+
+// 뺄셈: (a*d - b*c) / (b*d)
+Fraction operator-(const Fraction& left, const Fraction& right) {
+    int newNumer = left.numerator * right.denominator - right.numerator * left.denominator;
+    int newDenom = left.denominator * right.denominator;
+    return Fraction(newNumer, newDenom);
+}
+
+// 곱셈: (a*c) / (b*d)
+Fraction operator*(const Fraction& left, const Fraction& right) {
+    int newNumer = left.numerator * right.numerator;
+    int newDenom = left.denominator * right.denominator;
+    return Fraction(newNumer, newDenom);
+}
+
+// 나눗셈: (a*d) / (b*c) -> 뒤의 분수를 역수 취해서 곱함
+Fraction operator/(const Fraction& left, const Fraction& right) {
+    int newNumer = left.numerator * right.denominator;
+    int newDenom = left.denominator * right.numerator;
+    return Fraction(newNumer, newDenom);
+}
+
+
