@@ -2,8 +2,17 @@
 #define LIST_H
 #include <iostream>
 #include <cassert>
+#include <iomanip>
 
 using namespace std;
+
+// === [테스트 케이스 1] 사용자 정의 복합 객체 (Point) ===
+struct Point {
+    double x;
+    double y;
+};
+
+ostream& operator<<(std::ostream& os, const Point& p);
 
 template <typename T>
 struct Node{
